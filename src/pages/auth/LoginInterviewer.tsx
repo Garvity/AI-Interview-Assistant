@@ -35,7 +35,6 @@ export default function LoginInterviewer() {
         <Button type="primary" htmlType="submit" block>
           Login
         </Button>
-        {/* No register link visible for interviewer */}
         </Form>
       </Card>
     </div>
