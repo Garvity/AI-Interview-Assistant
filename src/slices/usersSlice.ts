@@ -7,7 +7,7 @@ export interface UserAccount {
   role: UserRole
   email: string
   name?: string
-  password: string // NOTE: demo only, stored in plain text for local persistence
+  password: string 
   createdAt: number
 }
 
