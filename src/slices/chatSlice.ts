@@ -96,4 +96,25 @@ const chatSlice = createSlice({
 })
 
 export const { initInterview, addMessage, startQuestion, answerQuestion, setGrading, endInterview, removeCandidateData } = chatSlice.actions
+
+// Selectors for user-specific data
+export const selectUserInterviews = (state: { chat: ChatState; tests: { byId: Record<string, { createdBy?: string }> } }, userId?: string) => {
+  if (!userId) return { interviews: {}, messages: {} }
+  
+  const userInterviews: Record<string, Interview> = {}
+  const userMessages: Record<string, ChatMessage[]> = {}
+  
+  Object.entries(state.chat.interviews).forEach(([candidateId, interview]) => {
+    if (interview.testId) {
+      const test = state.tests.byId[interview.testId]
+      if (test && test.createdBy === userId) {
+        userInterviews[candidateId] = interview
+        userMessages[candidateId] = state.chat.messages[candidateId] || []
+      }
+    }
+  })
+  
+  return { interviews: userInterviews, messages: userMessages }
+}
+
 export default chatSlice.reducer

@@ -33,6 +33,16 @@ const sessionSlice = createSlice({
       state,
       action: PayloadAction<{ role: 'interviewee' | 'interviewer'; user: { id: string; name?: string; email?: string } }>
     ) => {
+      // Clear any existing session data when logging in as a different user
+      const previousUserId = state.user?.id
+      const newUserId = action.payload.user.id
+      
+      if (previousUserId && previousUserId !== newUserId) {
+        // User is switching accounts - clear session-specific data
+        state.activeCandidateId = undefined
+        state.currentTestId = undefined
+      }
+      
       state.isAuthenticated = true
       state.role = action.payload.role
       state.user = action.payload.user
@@ -43,12 +53,20 @@ const sessionSlice = createSlice({
       state.role = undefined
       state.user = undefined
       state.showWelcomeBack = false
+      state.activeCandidateId = undefined
+      state.currentTestId = undefined
     },
     setCurrentTestId: (state, action: PayloadAction<string | undefined>) => {
       state.currentTestId = action.payload
     },
+    clearUserData: (state) => {
+      // Reset session-specific data when switching users
+      state.activeCandidateId = undefined
+      state.currentTestId = undefined
+      state.showWelcomeBack = false
+    },
   },
 })
 
-export const { setActiveCandidate, setWelcomeBack, login, logout, setCurrentTestId } = sessionSlice.actions
+export const { setActiveCandidate, setWelcomeBack, login, logout, setCurrentTestId, clearUserData } = sessionSlice.actions
 export default sessionSlice.reducer

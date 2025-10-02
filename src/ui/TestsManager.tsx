@@ -2,13 +2,13 @@ import { useState, useMemo } from 'react'
 import { Card, Form, Input, DatePicker, Switch, Button, Table, Popconfirm, Tag } from 'antd'
 import dayjs from 'dayjs'
 import { useAppDispatch, useAppSelector } from '../hooks'
-import { createTest, deleteTest, setActive, setExpiry, setLabel } from '../slices/testsSlice'
+import { createTest, deleteTest, setActive, setExpiry, setLabel, selectUserTests } from '../slices/testsSlice'
 import type { TestDefinition } from '../types'
 
 export default function TestsManager() {
   const dispatch = useAppDispatch()
-  const tests = useAppSelector((s) => s.tests)
   const user = useAppSelector((s) => s.session.user)
+  const tests = useAppSelector((s) => selectUserTests(s, user?.id))
   const data: TestDefinition[] = useMemo(() => tests.allIds.map((id: string) => tests.byId[id]), [tests])
   const [form] = Form.useForm()
   const [creating, setCreating] = useState(false)

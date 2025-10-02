@@ -15,6 +15,9 @@ export default function IntervieweePage() {
   const currentTestId = useAppSelector((s) => s.session.currentTestId)
   const tests = useAppSelector((s) => s.tests)
   const test = currentTestId ? tests.byId[currentTestId] : undefined
+  
+  // Validate test access - interviewees can access any active test
+  const isValidTest = test && test.active && (!test.expiresAt || test.expiresAt > Date.now())
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Layout.Header style={{ 
@@ -306,8 +309,34 @@ export default function IntervieweePage() {
           <Tabs
             defaultActiveKey="resume"
             items={[
-              { key: 'resume', label: '1. Resume & Details', children: (test && test.active && (!test.expiresAt || dayjs(test.expiresAt).isAfter(dayjs()))) ? <ResumeStep /> : <Card>Please enter a valid, active Test ID to begin.</Card> },
-              { key: 'chat', label: '2. Interview Chat', children: (test && test.active && (!test.expiresAt || dayjs(test.expiresAt).isAfter(dayjs()))) ? <ChatStep /> : <Card>Chat will be available once a valid Test ID is set.</Card> },
+              { 
+                key: 'resume', 
+                label: '1. Resume & Details', 
+                children: isValidTest ? <ResumeStep /> : (
+                  <Card>
+                    {currentTestId && !test ? 
+                      'Test ID not found. Please check with your interviewer for the correct Test ID.' :
+                      !test?.active ? 
+                        'This test is currently inactive. Please contact your interviewer.' :
+                        'Please enter a valid, active Test ID to begin.'
+                    }
+                  </Card>
+                )
+              },
+              { 
+                key: 'chat', 
+                label: '2. Interview Chat', 
+                children: isValidTest ? <ChatStep /> : (
+                  <Card>
+                    {currentTestId && !test ? 
+                      'Test ID not found. Interview chat is not available.' :
+                      !test?.active ? 
+                        'Interview chat is not available - test is inactive.' :
+                        'Chat will be available once a valid Test ID is set.'
+                    }
+                  </Card>
+                )
+              },
             ]}
             tabBarStyle={{
               gap: '16px',

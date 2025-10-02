@@ -15,13 +15,16 @@ const rootReducer = combineReducers({
   users: usersReducer,
 })
 
-const persistConfig = {
-  key: 'root',
+// Function to create user-scoped persistence config
+const createPersistConfig = (userId?: string) => ({
+  key: userId ? `ai-interview-${userId}` : 'ai-interview-guest',
   storage: localforage,
-  blacklist: [],
-}
+  blacklist: [], // We'll handle user isolation at the slice level
+})
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+// Default persist config for guest/initial state
+const defaultPersistConfig = createPersistConfig()
+const persistedReducer = persistReducer(defaultPersistConfig, rootReducer)
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -34,6 +37,26 @@ export const store = configureStore({
 })
 
 export const persistor = persistStore(store)
+
+// Function to create a new store with user-scoped persistence
+export const createUserStore = (userId: string) => {
+  const userPersistConfig = createPersistConfig(userId)
+  const userPersistedReducer = persistReducer(userPersistConfig, rootReducer)
+  
+  const userStore = configureStore({
+    reducer: userPersistedReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+  })
+  
+  const userPersistor = persistStore(userStore)
+  
+  return { store: userStore, persistor: userPersistor }
+}
 
 export type RootState = ReturnType<typeof rootReducer>
 export type AppDispatch = typeof store.dispatch

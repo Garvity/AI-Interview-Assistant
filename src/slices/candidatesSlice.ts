@@ -73,4 +73,25 @@ const candidatesSlice = createSlice({
 export const { upsertCandidate, updateProfile, setFinalResult, appendChat, setCandidateRecord, removeCandidate } =
   candidatesSlice.actions
 
+// Selectors for user-specific data
+export const selectUserCandidates = (state: { candidates: CandidatesState; tests: { byId: Record<string, { createdBy?: string }> } }, userId?: string) => {
+  if (!userId) return { byId: {}, allIds: [] }
+  
+  const userCandidates: Record<string, CandidateRecord> = {}
+  const userIds: string[] = []
+  
+  state.candidates.allIds.forEach(id => {
+    const candidate = state.candidates.byId[id]
+    if (candidate && candidate.profile.testId) {
+      const test = state.tests.byId[candidate.profile.testId]
+      if (test && test.createdBy === userId) {
+        userCandidates[id] = candidate
+        userIds.push(id)
+      }
+    }
+  })
+  
+  return { byId: userCandidates, allIds: userIds }
+}
+
 export default candidatesSlice.reducer

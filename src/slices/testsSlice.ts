@@ -57,4 +57,23 @@ const testsSlice = createSlice({
 })
 
 export const { createTest, deleteTest, setActive, setExpiry, setLabel } = testsSlice.actions
+
+// Selectors for user-specific data
+export const selectUserTests = (state: { tests: TestsState }, userId?: string) => {
+  if (!userId) return { byId: {}, allIds: [] }
+  
+  const userTests: Record<string, TestDefinition> = {}
+  const userIds: string[] = []
+  
+  state.tests.allIds.forEach(id => {
+    const test = state.tests.byId[id]
+    if (test && test.createdBy === userId) {
+      userTests[id] = test
+      userIds.push(id)
+    }
+  })
+  
+  return { byId: userTests, allIds: userIds }
+}
+
 export default testsSlice.reducer

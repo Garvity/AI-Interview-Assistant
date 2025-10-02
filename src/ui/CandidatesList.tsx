@@ -3,7 +3,7 @@ import { Card, Input, Table, Tag, Popconfirm, Button, Space, message } from 'ant
 import type { ColumnsType } from 'antd/es/table'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { setActiveCandidate, setCurrentTestId } from '../slices/sessionSlice'
-import { removeCandidate, updateProfile } from '../slices/candidatesSlice'
+import { removeCandidate, selectUserCandidates, updateProfile } from '../slices/candidatesSlice'
 import { removeCandidateData } from '../slices/chatSlice'
 import { persistor } from '../store'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +11,8 @@ import { useNavigate } from 'react-router-dom'
 export default function CandidatesList() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { byId, allIds } = useAppSelector((s) => s.candidates)
+  const user = useAppSelector((s) => s.session.user)
+  const { byId, allIds } = useAppSelector((s) => selectUserCandidates(s, user?.id))
   const [query, setQuery] = useState('')
 
   const roleLabels: Record<string, string> = {
