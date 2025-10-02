@@ -187,7 +187,6 @@ export default function ChatStep() {
       extra={
         <Space>
           <span style={{ minWidth: 160, display: 'inline-block' }}>Time Left: {remaining ?? 0}s</span>
-          {/* No regeneration button */}
           <Popconfirm
             title="End interview now?"
             description="This will stop the interview early and finalize the candidate based on answered questions."
