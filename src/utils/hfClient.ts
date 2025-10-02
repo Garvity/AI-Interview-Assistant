@@ -87,7 +87,7 @@ export async function generateQuestions(jobRole?: string, jobDescription?: strin
   const system: ChatMessage = {
     role: 'system',
     content:
-      'You are an expert technical interviewer. Return exactly 6 questions tailored to the role. The output must be strictly 6 lines, each line formatted as: difficulty|question. The difficulty must be easy, medium, or hard. Include 2 easy, 2 medium, 2 hard IN THAT ORDER (first two lines easy, next two medium, final two hard). For EASY questions, design them so the expected answer is a single word, and append " (one word)" at the end of the easy question text.',
+      'You are an expert technical interviewer. Return exactly 6 questions tailored to the role. The output must be strictly 6 lines, each line formatted as: difficulty|question. The difficulty must be easy, medium, or hard. Include 2 easy, 2 medium, 2 hard IN THAT ORDER (first two lines easy, next two medium, final two hard).',
   }
   const user: ChatMessage = {
     role: 'user',

@@ -84,8 +84,7 @@ export default function ChatStep() {
         window.clearInterval(timerRef.current ?? undefined)
         timerRef.current = null
         // Auto submit
-        const base = answer.trim()
-        const ans = currentQuestion.difficulty === 'easy' ? (base.split(/\s+/)[0] || '') : base
+        const ans = answer.trim()
         dispatch(addMessage({ candidateId: activeId, message: { role: 'user', content: ans || '(no answer provided)' } }))
         dispatch(answerQuestion({ candidateId: activeId, questionId: currentQuestion.id, answer: ans, autoSubmitted: true }))
       }
@@ -201,8 +200,7 @@ export default function ChatStep() {
 
   const onSubmit = () => {
     if (!activeId || !currentQuestion) return
-    // For easy questions, enforce one-word answer by taking the first token
-    const ans = currentQuestion.difficulty === 'easy' ? (answer.trim().split(/\s+/)[0] || '') : answer.trim()
+    const ans = answer.trim()
     dispatch(addMessage({ candidateId: activeId, message: { role: 'user', content: ans || '(no answer provided)' } }))
     dispatch(answerQuestion({ candidateId: activeId, questionId: currentQuestion.id, answer: ans }))
     setAnswer('')
@@ -269,9 +267,8 @@ export default function ChatStep() {
               {currentQuestion.difficulty === 'easy' ? (
                 <Input
                   value={answer}
-                  onChange={(e) => setAnswer((e.target.value || '').trim().split(/\s+/)[0] || '')}
-                  placeholder="Type a single-word answer…"
-                  maxLength={40}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder="Type your answer here…"
                   onPressEnter={onSubmit}
                   size="large"
                 />
