@@ -157,7 +157,38 @@ export default function ChatStep() {
           <Typography.Paragraph>
             When you are ready, click Start Interview. You will get 6 questions (2 easy, 2 medium, 2 hard). Each has a time limit. Ensure your job role is set correctly to receive role-specific questions.
           </Typography.Paragraph>
-          <Button type="primary" onClick={handleStartInterview} loading={starting}>
+          <Button 
+            type="primary" 
+            onClick={handleStartInterview} 
+            loading={starting}
+            size="large"
+            style={{
+              borderRadius: '8px',
+              background: starting 
+                ? 'linear-gradient(135deg, #d9d9d9 0%, #bfbfbf 100%)'
+                : 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
+              border: 'none',
+              fontWeight: 600,
+              boxShadow: starting 
+                ? '0 2px 6px rgba(0, 0, 0, 0.1)'
+                : '0 4px 12px rgba(82, 196, 26, 0.3)',
+              transition: 'all 0.3s ease',
+              minWidth: '140px',
+              minHeight: '48px'
+            }}
+            onMouseEnter={(e) => {
+              if (!starting) {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(82, 196, 26, 0.4)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!starting) {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(82, 196, 26, 0.3)'
+              }
+            }}
+          >
             Start Interview
           </Button>
           {startError && (
@@ -220,14 +251,19 @@ export default function ChatStep() {
       }
     >
       {currentQuestion ? (
-        <Row gutter={16}>
-          <Col xs={24} md={16}>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              <div>
-                <Tag color={currentQuestion.difficulty === 'easy' ? 'green' : currentQuestion.difficulty === 'medium' ? 'orange' : 'red'}>
+        <Row gutter={[8, 16]}>
+          <Col xs={24} lg={16}>
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <Tag 
+                  color={currentQuestion.difficulty === 'easy' ? 'green' : currentQuestion.difficulty === 'medium' ? 'orange' : 'red'}
+                  style={{ alignSelf: 'flex-start' }}
+                >
                   {currentQuestion.difficulty.toUpperCase()}
                 </Tag>
-                <Typography.Paragraph style={{ display: 'inline', marginLeft: 8 }}>{currentQuestion.text}</Typography.Paragraph>
+                <Typography.Paragraph style={{ margin: 0, fontSize: '14px', lineHeight: '1.5' }}>
+                  {currentQuestion.text}
+                </Typography.Paragraph>
               </div>
               <Progress percent={percent} status={remaining === 0 ? 'exception' : 'active'} />
               {currentQuestion.difficulty === 'easy' ? (
@@ -237,52 +273,125 @@ export default function ChatStep() {
                   placeholder="Type a single-word answer…"
                   maxLength={40}
                   onPressEnter={onSubmit}
+                  size="large"
                 />
               ) : (
                 <Input.TextArea
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
-                  rows={4}
+                  rows={3}
                   placeholder="Type your answer here..."
+                  size="large"
                 />
               )}
-              <Space>
-                <Button type="primary" onClick={onSubmit} disabled={remaining === 0} style={{ width: '100%' }}>Submit answer</Button>
-              </Space>
-              <div>
+              <Button 
+                type="primary" 
+                onClick={onSubmit} 
+                disabled={remaining === 0} 
+                style={{ 
+                  width: '100%',
+                  borderRadius: '8px',
+                  background: remaining === 0 
+                    ? 'linear-gradient(135deg, #d9d9d9 0%, #bfbfbf 100%)'
+                    : 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
+                  border: 'none',
+                  fontWeight: 600,
+                  boxShadow: remaining === 0 
+                    ? '0 2px 6px rgba(0, 0, 0, 0.1)'
+                    : '0 4px 12px rgba(24, 144, 255, 0.3)',
+                  transition: 'all 0.3s ease',
+                  minHeight: '48px'
+                }}
+                size="large"
+                onMouseEnter={(e) => {
+                  if (remaining !== 0) {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(24, 144, 255, 0.4)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (remaining !== 0) {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(24, 144, 255, 0.3)'
+                  }
+                }}
+              >
+                Submit answer
+              </Button>
+              <div style={{ marginTop: '16px' }}>
                 {interview.questions.slice(0, interview.currentIndex).map((q: Question) => (
-                  <div key={q.id} style={{ marginTop: 8 }}>
-                    <Tag color={q.difficulty === 'easy' ? 'green' : q.difficulty === 'medium' ? 'orange' : 'red'}>{q.difficulty.toUpperCase()}</Tag>
-                    {q.score != null && (
-                      <Typography.Text style={{ marginLeft: 8 }}>Score: {q.score}/10</Typography.Text>
-                    )}
+                  <div key={q.id} style={{ 
+                    marginBottom: '12px', 
+                    padding: '8px', 
+                    backgroundColor: '#f5f5f5', 
+                    borderRadius: '4px',
+                    fontSize: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <Tag 
+                        color={q.difficulty === 'easy' ? 'green' : q.difficulty === 'medium' ? 'orange' : 'red'}
+                        style={{ margin: 0, fontSize: '10px' }}
+                      >
+                        {q.difficulty.toUpperCase()}
+                      </Tag>
+                      {q.score != null && (
+                        <Typography.Text style={{ fontSize: '11px' }}>
+                          Score: {q.score}/10
+                        </Typography.Text>
+                      )}
+                    </div>
                     {q.feedback && (
-                      <Typography.Paragraph style={{ margin: 0 }}>Feedback: {q.feedback}</Typography.Paragraph>
+                      <Typography.Text style={{ fontSize: '11px', color: '#666' }}>
+                        {q.feedback}
+                      </Typography.Text>
                     )}
                   </div>
                 ))}
                 {interview.complete && candidate?.profile.finalScore != null && (
-                  <Typography.Paragraph>
-                    Final Score: {candidate.profile.finalScore} — {candidate.profile.summary}
-                  </Typography.Paragraph>
+                  <div style={{ 
+                    marginTop: '16px', 
+                    padding: '12px', 
+                    backgroundColor: '#e6f7ff', 
+                    borderRadius: '4px'
+                  }}>
+                    <Typography.Text strong>
+                      Final Score: {candidate.profile.finalScore}
+                    </Typography.Text>
+                    {candidate.profile.summary && (
+                      <Typography.Paragraph style={{ margin: '4px 0 0 0', fontSize: '12px' }}>
+                        {candidate.profile.summary}
+                      </Typography.Paragraph>
+                    )}
+                  </div>
                 )}
               </div>
             </Space>
           </Col>
-          <Col xs={24} md={8}>
-            <Typography.Title level={5}>Chat</Typography.Title>
-            <List
-              size="small"
-              bordered
-              dataSource={chatMessages.slice(-10)}
-              renderItem={(m: typeof chatMessages[number]) => (
-                <List.Item>
-                  <Typography.Text strong style={{ marginRight: 8 }}>{m.role.toUpperCase()}:</Typography.Text>
-                  <Typography.Text>{m.content}</Typography.Text>
-                </List.Item>
-              )}
-              style={{ maxHeight: 300, overflow: 'auto' }}
-            />
+          <Col xs={24} lg={8}>
+            <div style={{ marginTop: window.innerWidth < 992 ? '16px' : '0' }}>
+              <Typography.Title level={5} style={{ margin: '0 0 8px 0' }}>Chat</Typography.Title>
+              <List
+                size="small"
+                bordered
+                dataSource={chatMessages.slice(-10)}
+                renderItem={(m: typeof chatMessages[number]) => (
+                  <List.Item style={{ padding: '6px 8px' }}>
+                    <div style={{ width: '100%' }}>
+                      <Typography.Text strong style={{ fontSize: '11px', color: '#666' }}>
+                        {m.role.toUpperCase()}:
+                      </Typography.Text>
+                      <Typography.Text style={{ fontSize: '12px', display: 'block', marginTop: '2px' }}>
+                        {m.content}
+                      </Typography.Text>
+                    </div>
+                  </List.Item>
+                )}
+                style={{ 
+                  maxHeight: window.innerWidth < 992 ? 200 : 300, 
+                  overflow: 'auto' 
+                }}
+              />
+            </div>
           </Col>
         </Row>
       ) : (

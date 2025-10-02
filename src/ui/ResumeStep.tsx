@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Upload, Form, Input, Space, Button, Tag, App, Select } from 'antd'
+import { Card, Upload, Form, Input, Button, Tag, App, Select } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import { v4 as uuidv4 } from 'uuid'
 import { parsePdf, parseDocx, extractFieldsFromText } from '../utils/resume'
@@ -126,33 +126,73 @@ export default function ResumeStep() {
     setSavedAt(Date.now())
   }
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
   return (
     <Card title="Upload Resume and Confirm Details">
-      <Upload.Dragger multiple={false} beforeUpload={beforeUpload} disabled={uploading} accept=".pdf,.docx">
-        <p className="ant-upload-drag-icon">
+      <Upload.Dragger 
+        multiple={false} 
+        beforeUpload={beforeUpload} 
+        disabled={uploading} 
+        accept=".pdf,.docx"
+        style={{ 
+          padding: isMobile ? '12px' : '20px',
+          minHeight: isMobile ? '120px' : '180px'
+        }}
+      >
+        <p className="ant-upload-drag-icon" style={{ fontSize: isMobile ? '32px' : '48px' }}>
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">Click or drag file to this area to upload</p>
-        <p className="ant-upload-hint">PDF preferred. DOCX supported.</p>
+        <p className="ant-upload-text" style={{ fontSize: isMobile ? '14px' : '16px' }}>
+          {isMobile ? 'Tap to upload' : 'Click or drag file to this area to upload'}
+        </p>
+        <p className="ant-upload-hint" style={{ fontSize: isMobile ? '11px' : '14px' }}>
+          PDF preferred. DOCX supported.
+        </p>
       </Upload.Dragger>
 
       <Form
         form={form}
         layout="vertical"
-        style={{ marginTop: 24 }}
+        style={{ marginTop: isMobile ? 16 : 24 }}
         onFinish={onFinish}
         onValuesChange={() => savedAt && setSavedAt(null)}
       >
-        <Form.Item label="Full Name" name="name" rules={[{ required: true, message: 'Please enter your name' }]}>
-          <Input placeholder="Jane Doe" />
+        <Form.Item 
+          label="Full Name" 
+          name="name" 
+          rules={[{ required: true, message: 'Please enter your name' }]}
+        >
+          <Input 
+            placeholder="Jane Doe" 
+            size={isMobile ? 'large' : 'middle'}
+          />
         </Form.Item>
-        <Form.Item label="Email" name="email" rules={[{ required: true, type: 'email', message: 'Valid email required' }]}>
-          <Input placeholder="jane@example.com" />
+        <Form.Item 
+          label="Email" 
+          name="email" 
+          rules={[{ required: true, type: 'email', message: 'Valid email required' }]}
+        >
+          <Input 
+            placeholder="jane@example.com" 
+            size={isMobile ? 'large' : 'middle'}
+          />
         </Form.Item>
-        <Form.Item label="Phone" name="phone" rules={[{ required: true, message: 'Please enter your phone' }]}>
-          <Input placeholder="+1 555 123 4567" />
+        <Form.Item 
+          label="Phone" 
+          name="phone" 
+          rules={[{ required: true, message: 'Please enter your phone' }]}
+        >
+          <Input 
+            placeholder="+1 555 123 4567" 
+            size={isMobile ? 'large' : 'middle'}
+          />
         </Form.Item>
-        <Form.Item label="Job Role" name="jobRole" rules={[{ required: true, message: 'Select a job role' }]}>
+        <Form.Item 
+          label="Job Role" 
+          name="jobRole" 
+          rules={[{ required: true, message: 'Select a job role' }]}
+        >
           <Select
             placeholder="Select the interview role"
             options={[
@@ -161,15 +201,48 @@ export default function ResumeStep() {
               { value: 'web_development', label: 'Web Development' },
               { value: 'ai_ml_engineer', label: 'AI/ML Engineer' },
             ]}
-            style={{ maxWidth: 360 }}
+            style={{ width: '100%', maxWidth: isMobile ? 'none' : '360px' }}
+            size={isMobile ? 'large' : 'middle'}
           />
         </Form.Item>
-        <Space align="center" size="middle">
-          <Button type="primary" htmlType="submit" loading={uploading}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px',
+          flexDirection: isMobile ? 'column' : 'row'
+        }}>
+          <Button 
+            type="primary" 
+            htmlType="submit" 
+            loading={uploading}
+            size={isMobile ? 'large' : 'middle'}
+            style={{ 
+              width: isMobile ? '100%' : 'auto',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
+              border: 'none',
+              fontWeight: 600,
+              boxShadow: '0 4px 12px rgba(24, 144, 255, 0.3)',
+              transition: 'all 0.3s ease',
+              minWidth: '120px'
+            }}
+            onMouseEnter={(e) => {
+              if (!uploading) {
+                e.currentTarget.style.transform = 'translateY(-2px)'
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(24, 144, 255, 0.4)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!uploading) {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(24, 144, 255, 0.3)'
+              }
+            }}
+          >
             Save Details
           </Button>
           {savedAt && <Tag color="green">Details saved</Tag>}
-        </Space>
+        </div>
       </Form>
     </Card>
   )

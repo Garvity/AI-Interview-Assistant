@@ -32,10 +32,34 @@ export default function CandidatesList() {
   }, [byId, allIds, query])
 
   type Row = NonNullable<(typeof data)[number]>
+  
+  // Mobile-friendly columns configuration
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+  
   const columns: ColumnsType<Row> = [
-    { title: 'Name', dataIndex: ['profile', 'name'], key: 'name', sorter: (a, b) => (a.profile.name ?? '').localeCompare(b.profile.name ?? '') },
-    { title: 'Email', dataIndex: ['profile', 'email'], key: 'email', sorter: (a, b) => (a.profile.email ?? '').localeCompare(b.profile.email ?? '') },
-    { title: 'Phone', dataIndex: ['profile', 'phone'], key: 'phone' },
+    { 
+      title: 'Name', 
+      dataIndex: ['profile', 'name'], 
+      key: 'name', 
+      sorter: (a, b) => (a.profile.name ?? '').localeCompare(b.profile.name ?? ''),
+      width: isMobile ? 100 : undefined,
+      ellipsis: true
+    },
+    { 
+      title: 'Email', 
+      dataIndex: ['profile', 'email'], 
+      key: 'email', 
+      sorter: (a, b) => (a.profile.email ?? '').localeCompare(b.profile.email ?? ''),
+      responsive: ['md'],
+      ellipsis: true
+    },
+    { 
+      title: 'Phone', 
+      dataIndex: ['profile', 'phone'], 
+      key: 'phone',
+      responsive: ['lg'],
+      ellipsis: true
+    },
     {
       title: 'Role',
       dataIndex: ['profile', 'jobRole'],
@@ -47,10 +71,21 @@ export default function CandidatesList() {
         { text: 'AI/ML Engineer', value: 'ai_ml_engineer' },
       ],
       onFilter: (v, r) => r.profile.jobRole === v,
-      render: (r?: string) => roleLabels[r ?? ''] ?? '-',
+      render: (r?: string) => (
+        <Tag style={{ fontSize: isMobile ? '10px' : '12px' }}>
+          {isMobile ? (r === 'full_stack' ? 'FS' : r === 'java_backend' ? 'Java' : r === 'web_development' ? 'Web' : r === 'ai_ml_engineer' ? 'AI/ML' : '-') : (roleLabels[r ?? ''] ?? '-')}
+        </Tag>
+      ),
       sorter: (a, b) => (roleLabels[a.profile.jobRole ?? ''] ?? '').localeCompare(roleLabels[b.profile.jobRole ?? ''] ?? ''),
+      width: isMobile ? 60 : undefined
     },
-    { title: 'Test ID', dataIndex: ['profile', 'testId'], key: 'testId' },
+    { 
+      title: 'Test ID', 
+      dataIndex: ['profile', 'testId'], 
+      key: 'testId',
+      responsive: ['lg'],
+      ellipsis: true
+    },
     {
       title: 'Status',
       dataIndex: ['profile', 'status'],
@@ -61,18 +96,34 @@ export default function CandidatesList() {
         { text: 'Completed', value: 'completed' },
       ],
       onFilter: (v, r) => r.profile.status === v,
-      render: (s: string) => <Tag color={s === 'completed' ? 'green' : s === 'in_progress' ? 'blue' : 'default'}>{s}</Tag>,
+      render: (s: string) => (
+        <Tag 
+          color={s === 'completed' ? 'green' : s === 'in_progress' ? 'blue' : 'default'}
+          style={{ fontSize: isMobile ? '9px' : '11px', padding: isMobile ? '1px 4px' : undefined }}
+        >
+          {isMobile ? (s === 'completed' ? 'Done' : s === 'in_progress' ? 'Active' : 'New') : s}
+        </Tag>
+      ),
+      width: isMobile ? 50 : undefined
     },
-  { title: 'Score', dataIndex: ['profile', 'finalScore'], key: 'score', sorter: (a, b) => (a.profile.finalScore ?? -1) - (b.profile.finalScore ?? -1) },
+    { 
+      title: 'Score', 
+      dataIndex: ['profile', 'finalScore'], 
+      key: 'score', 
+      sorter: (a, b) => (a.profile.finalScore ?? -1) - (b.profile.finalScore ?? -1),
+      width: isMobile ? 50 : undefined,
+      render: (score) => score != null ? score : '-'
+    },
     {
       title: 'Actions',
       key: 'actions',
       fixed: 'right',
-      width: 140,
+      width: isMobile ? 80 : 140,
       render: (_: unknown, r) => (
-        <Space>
+        <Space size={isMobile ? 4 : 8}>
           <Button
             size="small"
+            type="primary"
             onClick={() => {
               dispatch(setActiveCandidate(r.profile.id))
               if (r.profile.testId) dispatch(setCurrentTestId(r.profile.testId))
@@ -82,14 +133,37 @@ export default function CandidatesList() {
               dispatch(removeCandidateData({ candidateId: r.profile.id }))
               navigate('/interviewee')
             }}
+            style={{ 
+              fontSize: isMobile ? '10px' : '12px',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
+              border: 'none',
+              fontWeight: 600,
+              boxShadow: '0 2px 6px rgba(82, 196, 26, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1px)'
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(82, 196, 26, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 2px 6px rgba(82, 196, 26, 0.3)'
+            }}
           >
-            Begin
+            {isMobile ? 'Start' : 'Begin'}
           </Button>
           <Popconfirm
             title="Delete candidate?"
             description={`Remove ${r.profile.name || r.profile.email}? This cannot be undone.`}
             okText="Delete"
-            okButtonProps={{ danger: true }}
+            okButtonProps={{ 
+              danger: true,
+              style: {
+                borderRadius: '6px',
+                fontWeight: 600
+              }
+            }}
             onConfirm={() => {
               const currentActive = (typeof window !== 'undefined' ? window.localStorage.getItem('activeCandidateId') : undefined)
               dispatch(removeCandidate({ id: r.profile.id }))
@@ -101,7 +175,30 @@ export default function CandidatesList() {
               message.success('Candidate deleted')
             }}
           >
-            <Button danger size="small">Delete</Button>
+            <Button 
+              danger 
+              size="small"
+              style={{ 
+                fontSize: isMobile ? '10px' : '12px',
+                borderRadius: '6px',
+                background: 'linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%)',
+                border: 'none',
+                fontWeight: 600,
+                boxShadow: '0 2px 6px rgba(255, 77, 79, 0.3)',
+                transition: 'all 0.2s ease',
+                color: '#fff'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1px)'
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(255, 77, 79, 0.4)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 2px 6px rgba(255, 77, 79, 0.3)'
+              }}
+            >
+              {isMobile ? 'Del' : 'Delete'}
+            </Button>
           </Popconfirm>
         </Space>
       ),
@@ -126,14 +223,27 @@ export default function CandidatesList() {
         </Space>
       }
     >
-      <Input.Search placeholder="Search by name or email" value={query} onChange={(e) => setQuery(e.target.value)} style={{ marginBottom: 16 }} />
+      <Input.Search 
+        placeholder="Search by name or email" 
+        value={query} 
+        onChange={(e) => setQuery(e.target.value)} 
+        style={{ marginBottom: 12 }}
+        size={isMobile ? 'large' : 'middle'}
+      />
       <Table
         rowKey={(r) => r.profile.id}
         dataSource={data}
         columns={columns}
         onRow={(record) => ({ onClick: () => dispatch(setActiveCandidate(record.profile.id)) })}
-        pagination={{ pageSize: 8, responsive: true }}
-  scroll={{ x: 1024 }}
+        pagination={{ 
+          pageSize: isMobile ? 5 : 8, 
+          responsive: true,
+          showSizeChanger: false,
+          showQuickJumper: false,
+          size: isMobile ? 'small' : 'default'
+        }}
+        scroll={{ x: isMobile ? 400 : 1024 }}
+        size={isMobile ? 'small' : 'middle'}
         rowClassName={(record) => (record.profile.id === (typeof window !== 'undefined' ? window.localStorage.getItem('activeCandidateId') : '') ? 'ant-table-row-selected' : '')}
       />
     </Card>

@@ -27,7 +27,7 @@ npm run lint
 - **UI Library**: Ant Design (antd) with icons
 - **State Management**: Redux Toolkit + redux-persist (IndexedDB via localforage)
 - **Routing**: React Router DOM
-- **File Processing**: 
+- **File Processing**:
   - PDF: pdfjs-dist
   - DOCX: mammoth
 - **HTTP Client**: axios
