@@ -75,9 +75,9 @@ Tip: You can pre-create different Test IDs (e.g., FE_JUNIOR_2025) to map to spec
 - Per-question timers and auto-submit on timeout
 - Scoring (points-based):
   - Easy: 10 points each
-  - Medium: 15 points each
-  - Hard: 25 points each
-  - Final score is out of 100
+  - Medium: 10 points each
+  - Hard: 10 points each
+  - Final score is out of 60
 - Interviewer dashboard: list/search/sort candidates, begin new interview, and delete
 - Local persistence using Redux Toolkit + redux-persist (IndexedDB via localforage)
 
